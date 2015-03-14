@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+  <h1>My Messages</h1>
+  {% for msg in messages %}
+  	<pre>msg</pre>
+  {% endfor %}
+{% endblock %}

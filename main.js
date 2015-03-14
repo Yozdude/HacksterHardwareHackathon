@@ -63,7 +63,7 @@ function setupHapi () {
     var deferred = Q.defer(),
         server = new Hapi.Server();
 
-    server.connection({ port: Config.server.port });
+    server.connection({ host: 'localhost', port: Config.server.port });
 
     // Register Hapi plugins
     server.register(require('hapi-auth-cookie'), function (err) {

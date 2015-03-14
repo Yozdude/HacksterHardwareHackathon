@@ -5,19 +5,19 @@ module.exports = {
         // If you need a username and password, add them as 'username' and 'password' fields
         address: 'localhost',
         port: '27017',
-        database: 'nodejs_base'
+        database: 'hackster'
     },
     server: {
-        port: 8000
+        port: 3002
     },
     nunjucks: {
         templatePath: Path.join(__dirname, 'html_templates')
     },
     app: {
-        name: "Node.js Base",
+        name: "LEDorean",
         version: "1.0",
-        creatorName: "Yozdude",
-        creatorUrl: "https://github.com/Yozdude"
+        creatorName: "Team LEDorean",
+        creatorUrl: "https://github.com/Yozdude/HacksterHardwareHackathon"
     },
     security: {
         cookie: {

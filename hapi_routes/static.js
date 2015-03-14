@@ -28,8 +28,13 @@ var indexRoute = {
     config: {
         auth: 'session',
         handler: function(request, reply) {
-            // TODO: add user from request.auth.session and config data
-            reply.view('index.html', {});
+            if (!request.auth.isAuthenticated) {
+                reply.redirect("/login");
+            }
+            
+            reply.view('index.html', {
+            	credentials: request.auth.credentials
+            });
         }
     }
 }
