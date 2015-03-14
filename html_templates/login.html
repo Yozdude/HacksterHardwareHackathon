@@ -1,0 +1,54 @@
+{% extends 'empty.html' %}
+
+
+{% block body %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4"></div>
+      <div class="col-md-4">
+        <div class="panel panel-info panel-login">
+          <div class="panel-heading">
+            <h1>{{ app.name }}</h1>
+          </div>
+          <div class="panel-body">
+            <div>
+              <input id="email" type="text" class="form-control" placeholder="Email">
+              <input id="password" type="password" class="form-control" placeholder="Password">
+              <button id="submit" class="btn btn-success">Login/Register</button>
+            </div>
+            <span class="tiny-text float-left">version {{ app.version }}</span>
+            <span class="tiny-text float-right">created by <a href="{{ app.creatorUrl }}">{{ app.creatorName }}</a></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4"></div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block foot %}
+<script type="text/javascript">
+  $(function () {
+    $("#submit").on('click', function () {
+      $.post("/login", {
+        email: $("#email").val(),
+        password: $("#password").val()
+      });
+    });
+
+    $("#email").keypress(function (e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        $("#password").focus()
+      }
+    });
+
+    $("#password").keypress(function (e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        $("#submit").trigger("click");
+      }
+    });
+  });
+</script>
+{% endblock %}
