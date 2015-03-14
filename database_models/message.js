@@ -6,7 +6,8 @@ var MessageSchema = new Schema({
 	user: String,
 	lng: Number,
 	lat: Number,
-	msg: String
+	text: String,
+	time: { type: Date, required: true, default: Date.now }
 });
 
 module.exports = mongoose.model('Message', MessageSchema);

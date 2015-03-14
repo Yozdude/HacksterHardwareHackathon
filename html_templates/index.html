@@ -1,7 +1,64 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<style>
+	button {
+		width: 100%;
+		font-size: 24px;
+	}
+</style>
+{% endblock %}
 
 {% block content %}
-  <h1>Welcome!</h1>
-  <h2>This is index.html, where something more interesting should go.</h2>
+	<div class="row">
+	  <div class="col-sm-12">
+	  	<button class="btn btn-success" onclick="setMessage(this)">Test Message</button>
+	  </div>
+	</div>
+{% endblock %}
+
+{% block foot %}
+<script type="text/javascript">
+	function setMessage(dom) {
+		$.post("/api/setNextMessage", {
+	        user: "{{ credentials.email }}",
+	        message: $(dom).text()
+	    });
+	}
+	
+	function getMessage() {
+		$.post("/api/getNextMessage", {
+	        user: "{{ credentials.email }}"
+	    }, function (result) {
+		    console.log(result);
+	    });
+	}
+	
+	var gpsOptions = {
+		enableHighAccuracy: true,
+		timeout: 1000,
+		maximumAge: 0
+	};
+	
+	function sendPosition() {
+		if (navigator.geolocation) {
+	        navigator.geolocation.getCurrentPosition(function (position) {
+		        $.post("/api/setPosition", {
+			        user: "{{ credentials.email }}",
+			        latitude: position.coords.latitude,
+			        longitude: position.coords.longitude
+			    });
+	        }, function (err) {
+		        console.log(err);
+	        }, gpsOptions);
+	    } else { 
+	        console.log("Geolocation is not supported by this browser.");
+	    }
+	}
+	
+	var gpsInterval;
+	$(function () {
+		//gpsInterval = setInterval(sendPosition, 1000)
+	});
+</script>
 {% endblock %}

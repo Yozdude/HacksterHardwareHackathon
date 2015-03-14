@@ -8,7 +8,7 @@ module.exports = {
         database: 'hackster'
     },
     server: {
-        port: 3002
+        port: 3003
     },
     nunjucks: {
         templatePath: Path.join(__dirname, 'html_templates')

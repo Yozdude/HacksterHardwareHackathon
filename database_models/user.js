@@ -7,7 +7,11 @@ var mongoose = require('mongoose'),
 var UserSchema = new Schema({
 	email: { type: String, required: true, index: { unique: true } },
 	password: { type: String, required: true },
-	creationDate: { type: Date, required: true, default: Date.now }
+	creationDate: { type: Date, required: true, default: Date.now },
+	nextMessage: { type: String, default: "" },
+	myMessages: [String],
+	lng: Number,
+	lat: Number
 });
 
 UserSchema.pre('save', function(next) {
