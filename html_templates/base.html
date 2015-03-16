@@ -7,3 +7,34 @@
     {% block content %}{% endblock %}
   </div>
 {% endblock %}
+
+{% block foot %}
+<script type="text/javascript">
+	var gpsOptions = {
+		enableHighAccuracy: true,
+		timeout: 1000,
+		maximumAge: 0
+	};
+	
+	function sendPosition() {
+		if (navigator.geolocation) {
+	        navigator.geolocation.getCurrentPosition(function (position) {
+		        $.post("/api/setPosition", {
+			        user: "{{ credentials.email }}",
+			        latitude: position.coords.latitude,
+			        longitude: position.coords.longitude
+			    });
+	        }, function (err) {
+		        console.log(err);
+	        }, gpsOptions);
+	    } else { 
+	        console.log("Geolocation is not supported by this browser.");
+	    }
+	}
+	
+	var gpsInterval;
+	$(function () {
+		//gpsInterval = setInterval(sendPosition, 1000)
+	});
+</script>
+{% endblock %}

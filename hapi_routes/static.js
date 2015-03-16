@@ -1,3 +1,5 @@
+var User = require('../database_models/user');
+
 // Serve all files in the 'public' folder as static resources.
 // Used to provide css, js, and image files.
 var staticFileRoute = {
@@ -32,8 +34,19 @@ var indexRoute = {
                 reply.redirect("/login");
             }
             
-            reply.view('index.html', {
-            	credentials: request.auth.credentials
+            User.findOne({ email: request.auth.credentials.email }, function (err, user) {
+	            if (err) reply({ error: err });
+	            
+	            if (user) {
+	            	reply.view('index.html', {
+		            	credentials: request.auth.credentials,
+		            	messages: user.myMessages
+		            });
+				} else {
+		            reply.view('index.html', {
+		            	credentials: request.auth.credentials
+		            });
+	            }
             });
         }
     }

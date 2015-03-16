@@ -36,8 +36,13 @@ var mapRoute = {
                 reply.redirect("/login");
             }
             
-            reply.view('map.html', {
-            	credentials: request.auth.credentials
+            var myMessages = Message.find().exec(function (err, messages) {
+	            if (err) throw err;
+	            
+	            reply.view('map.html', {
+	            	credentials: request.auth.credentials,
+	            	messages: JSON.stringify(messages)
+	            });
             });
         }
     }
@@ -84,10 +89,17 @@ var getNextMessageRoute = {
                 user: Joi.string().required()
             }
         },
+        plugins: {
+        	'hapi-auth-cookie': {
+        		redirectTo: false
+        	}
+        },
+        /*
         auth: {
         	mode: 'try',
         	strategy: 'session'
         },
+        */
         handler: function(request, reply) {
             User.findOne({ email: request.payload.user }, function (err, user) {
 	            if (err) reply({ error: err });
@@ -108,9 +120,10 @@ var getNextMessageRoute = {
 		            		message.save(function (err, message) {});
 	            		}
 	            		
-		            	reply({ message: msg });
+	            		console.log("Got getNextMessage request. Responding with " + msg);
+		            	reply(msg);
 	            	});
-            } else {
+				} else {
 		            reply({ error: "No such user as " + request.payload.user });
 	            }
             });
@@ -144,7 +157,7 @@ var setPositionRoute = {
 	            		if (err) reply({ error: err });
 		            	reply({ done: true });
 	            	});
-            } else {
+				} else {
 		            reply({ error: "No such user as " + request.payload.user });
 	            }
             });
@@ -152,5 +165,110 @@ var setPositionRoute = {
     }
 }
 
+var newMessageRoute = {
+    method: 'POST',
+    path: '/api/newMessage',
+    config: {
+    	validate: {
+            payload: {
+                user: Joi.string().required(),
+                text: Joi.string().required()
+            }
+        },
+        auth: {
+        	mode: 'try',
+        	strategy: 'session'
+        },
+        handler: function(request, reply) {
+            User.findOne({ email: request.payload.user }, function (err, user) {
+	            if (err) reply({ error: err });
+	            
+	            if (user) {
+	            	user.myMessages.push(request.payload.text);
+	            	user.save(function (err, user) {
+	            		if (err) reply({ error: err });
+		            	reply({ redirect: "/" });
+	            	});
+				} else {
+		            reply({ error: "No such user as " + request.payload.user });
+	            }
+            });
+        }
+    }
+}
 
-module.exports = [myMessageRoute, mapRoute, setNextMessageRoute, getNextMessageRoute, setPositionRoute]
+var deleteMessageRoute = {
+    method: 'POST',
+    path: '/api/deleteMessage',
+    config: {
+    	validate: {
+            payload: {
+                user: Joi.string().required(),
+                index: Joi.number().required()
+            }
+        },
+        auth: {
+        	mode: 'try',
+        	strategy: 'session'
+        },
+        handler: function(request, reply) {
+            User.findOne({ email: request.payload.user }, function (err, user) {
+	            if (err) reply({ error: err });
+	            
+	            if (user) {
+	            	user.myMessages.splice(request.payload.index, 1);
+	            	user.save(function (err, user) {
+	            		if (err) reply({ error: err });
+		            	reply({ redirect: "/" });
+	            	});
+				} else {
+		            reply({ error: "No such user as " + request.payload.user });
+	            }
+            });
+        }
+    }
+}
+
+// a%40a.com
+var getNextMessageGetRoute = {
+    method: 'GET',
+    path: '/api/getNextMessageGet',
+    config: {
+        plugins: {
+        	'hapi-auth-cookie': {
+        		redirectTo: false
+        	}
+        },
+        handler: function(request, reply) {
+        	console.log("getNextMessageGet");
+            User.findOne({ email: "a@a.com" }, function (err, user) {
+	            if (err) reply({ error: err });
+	            
+	            if (user) {
+	            	var msg = user.nextMessage;
+	            	user.nextMessage = "";
+	            	user.save(function (err, user) {
+	            		if (err) reply({ error: err });
+	            		
+	            		if (msg) {
+		            		var message = new Message({
+			            		user: "a@a.com",
+			            		lng: user.lng,
+			            		lat: user.lat,
+			            		text: msg
+		            		});
+		            		message.save(function (err, message) {});
+	            		}
+	            		
+	            		console.log("Got getNextMessageGet request. Responding with " + msg);
+		            	reply(msg);
+	            	});
+				} else {
+		            reply({ error: "No such user as a@a.com" });
+	            }
+            });
+        }
+    }
+}
+
+module.exports = [myMessageRoute, mapRoute, setNextMessageRoute, getNextMessageRoute, setPositionRoute, newMessageRoute, deleteMessageRoute, getNextMessageGetRoute]

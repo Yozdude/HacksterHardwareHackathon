@@ -1,6 +1,55 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<style>
+	#map-canvas {
+		height: 320px;
+		width: 100%;
+		margin: 0px;
+		padding: 0px;
+	}
+</style>
+{% endblock %}
 
 {% block content %}
-  <h1>Map</h1>
+  <h1>Message Map</h1>
+  <div id="map-canvas"></div>
+{% endblock %}
+
+{% block foot %}
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+<script>
+	var map;
+	function initialize() {
+		var mapOptions = {
+			zoom: 15
+		};
+		map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+		
+		if(navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(position) {
+				var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+				map.setCenter(pos);
+			}, function() {
+				console.log("geolocaiton failure");
+			});
+		} else {
+			console.log("geolocation failure");
+		}
+		
+		var messages = JSON.parse('{{ messages }}');
+		for (i in messages) {
+			var msg = messages[i];
+			var pos = new google.maps.LatLng(msg.lat, msg.lng);
+			var infowindow = new google.maps.InfoWindow({
+				map: map,
+				position: pos,
+				content: msg.user + ": " + msg.text
+			});
+		}
+	}
+	
+	google.maps.event.addDomListener(window, 'resize', initialize);
+	google.maps.event.addDomListener(window, 'load', initialize);
+</script>
 {% endblock %}

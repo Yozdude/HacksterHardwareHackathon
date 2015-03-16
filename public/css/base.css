@@ -11,6 +11,10 @@ body .btn {
     font-size: 24px;
 }
 
+h1 {
+	margin-top: 0px;
+}
+
 .alert-primary {
     width: 90%;
     left: 5%;

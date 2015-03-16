@@ -3,18 +3,37 @@
 {% block head %}
 <style>
 	button {
-		width: 100%;
 		font-size: 24px;
+		margin-bottom: 5px !important;
+	}
+	.btn-success {
+		margin-top: 5px;
+		width: 100%;
 	}
 </style>
 {% endblock %}
 
 {% block content %}
 	<div class="row">
+	  {% for msg in messages %}
 	  <div class="col-sm-12">
-	  	<button class="btn btn-success" onclick="setMessage(this)">Test Message</button>
+	  	<button class="btn btn-primary" style="width: 80%;" onclick="setMessage(this)">{{ msg }}</button>
+	  	<button class="btn btn-danger" onclick="deleteMessage({{ loop.index }})"><i class="fa fa-times"></i></button>
+	  </div>
+	  {% endfor %}
+	</div>
+	<hr/>
+	<div class="row">
+	  <div class="col-sm-12">
+	  	<input id="newMessageInput" type="text" class="form-control" placeholder="New Message Text">
 	  </div>
 	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<button class="btn btn-success" onclick="setNewMessage()">Enter New Message <i class="fa fa-check"></i></button>
+		</div>
+	</div>
+	<button class="btn btn-warning" onclick="getMessage()">Fake Send <i class="fa fa-motorcycle"></i></button>
 {% endblock %}
 
 {% block foot %}
@@ -34,31 +53,18 @@
 	    });
 	}
 	
-	var gpsOptions = {
-		enableHighAccuracy: true,
-		timeout: 1000,
-		maximumAge: 0
-	};
-	
-	function sendPosition() {
-		if (navigator.geolocation) {
-	        navigator.geolocation.getCurrentPosition(function (position) {
-		        $.post("/api/setPosition", {
-			        user: "{{ credentials.email }}",
-			        latitude: position.coords.latitude,
-			        longitude: position.coords.longitude
-			    });
-	        }, function (err) {
-		        console.log(err);
-	        }, gpsOptions);
-	    } else { 
-	        console.log("Geolocation is not supported by this browser.");
-	    }
+	function deleteMessage(index) {
+		$.post("/api/deleteMessage", {
+	        user: "{{ credentials.email }}",
+	        index: index - 1
+	    });
 	}
 	
-	var gpsInterval;
-	$(function () {
-		//gpsInterval = setInterval(sendPosition, 1000)
-	});
+	function setNewMessage() {
+		$.post("/api/newMessage", {
+	        user: "{{ credentials.email }}",
+	        text: $("#newMessageInput").val()
+	    });
+	}
 </script>
 {% endblock %}
